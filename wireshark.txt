@@ -1,0 +1,26 @@
+Packet Sniffing with Wireshark
+
+The objective is to capture live network traffic, filter for specific protocols, and analyze the raw data payload to understand how applications communicate over the network.
+
+Step 1: Initialization and Interface Selection
+1.	Launch Wireshark (ensure you are running it with Administrator/Root privileges, as accessing network hardware requires elevated permissions).
+2.	The home screen will display a list of available network interfaces. Identify your active interface (usually Wi-Fi, Ethernet, eth0, or wlan0—look for the sparkline showing active traffic).
+3.	Double-click the active interface to immediately begin the live packet capture.
+
+Step 2: Traffic Generation
+1.	While Wireshark is capturing, open a web browser.
+2.	To capture easily readable data, navigate to a website that uses unencrypted HTTP (e.g., http://neverssl.com or a local vulnerable lab server).
+3.	Perform an action, such as submitting a dummy login form.
+4.	Return to Wireshark and click the red Stop Capture square in the top left toolbar.
+
+Step 3: Protocol Filtering and Dissection
+1.	Apply a Display Filter: The raw capture will have thousands of background packets. In the filter bar at the top, type http and press Enter. This isolates only web traffic.
+2.	Select a Packet: Click on an HTTP GET or HTTP POST request in the top pane.
+3.	Follow the Stream: Right-click the packet and select Follow > TCP Stream.
+4.	Analyze the Payload: A new window will open displaying the entire conversation between your client and the server. If you submitted a login form over HTTP, you will see the username and password in plain text.
+
+http://testphp.vulnweb.com/login.php
+or
+techpanda.org
+email: admin@google.com
+password: Password@123
