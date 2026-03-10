@@ -1,0 +1,26 @@
+1. Interface Configuration: ifconfig
+•	Command: ifconfig (or ifconfig eth0 to specify an interface).
+•	Execution & Analysis: This command queries the kernel for the current state of active network interfaces.
+o	inet: Your IPv4 address (e.g., 192.168.1.15).
+o	netmask: The subnet mask, defining the network boundary.
+o	ether: The MAC address (Hardware address) of your Network Interface Card (NIC).
+o	RX/TX packets: Receive and Transmit statistics, useful for spotting network flooding or hardware drops.
+
+2. Connectivity Testing: ping
+•	Command: ping -c 4 google.com (The -c 4 limits it to 4 packets).
+•	Execution & Analysis: * Sequence (seq): Ensures packets are received in order.
+o	Time (RTT - Round Trip Time): Measures latency in milliseconds.
+o	Packet Loss: If the summary shows 100% packet loss, the target is offline, or a firewall is aggressively dropping ICMP packets.
+
+3. Active Connection Auditing: netstat
+•	Command: netstat -tulnp
+o	(-t = TCP, -u = UDP, -l = Listening ports, -n = Numeric IPs, -p = Program/PID).
+•	Execution & Analysis: This reveals what your machine is communicating with and what services are exposed.
+o	Proto: Shows TCP or UDP.
+o	Local Address: The IP and port your machine is using (e.g., 0.0.0.0:22 means SSH is listening on all interfaces).
+o	State: Look for LISTEN (waiting for connections) or ESTABLISHED (active data transfer).
+
+4. Route Tracing: traceroute
+•	Command: traceroute google.com
+•	Execution & Analysis: The output displays a numbered list of "hops" (routers) between your machine and the target server, along with the latency to reach each specific hop.
+
