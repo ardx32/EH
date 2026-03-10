@@ -1,0 +1,41 @@
+import requests
+import json
+import os
+
+def get_mistral_output(prompt):
+    # 1. Configuration
+    url = "https://api.mistral.ai/v1/chat/completions"
+    api_key = os.environ.get("MISTRAL_API_KEY", "hjDZDIZDUCmjR3LrN0QjrckAdcesFB2N")
+    
+    # 2. Setup Headers and Payload
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+    
+    data = {
+        "model": "mistral-large-latest",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.7
+    }
+
+    # 3. Execution
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        response.raise_for_status() # Check for HTTP errors
+        
+        # 4. Parse Result
+        result = response.json()
+        return result['choices'][0]['message']['content']
+
+    except requests.exceptions.RequestException as e:
+        return f"API Error: {e}"
+
+if __name__ == "__main__":
+    prompt = "Codings "
+    output = get_mistral_output(prompt)
+    print("Mistral Response:\n", output)
