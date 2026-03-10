@@ -1,0 +1,19 @@
+Method 1: Web-Based WHOIS Lookup (Example 1)
+1.	Ensure you have an active internet connection and open a web browser.
+2.	Navigate to a WHOIS lookup website.
+3.	Step 1: Select a target domain. For instance, you can use instagram.com.
+4.	Analyze the generated report for key infrastructure details, including:
+o	Registrar Information.
+o	Important Dates (such as Created, Updated, and Expires).
+o	Nameservers and their corresponding IP addresses.
+o	Contact Information (Tech and Admin contacts).
+
+Method 2: Command-Line Interface (Example 2)
+This method utilizes the Sysinternals command-line tool for Windows environments.
+1.	Download the whois package directly from Microsoft: https://docs.microsoft.com/en-us/sysinternals/downloads/whois.
+2.	Extract the downloaded whois package to a known directory.
+3.	Open the Windows Command Prompt.
+4.	Change your directory to the extracted whois folder using the cd command.
+5.	Execute the WHOIS query against your target domain by typing the command and pressing Enter. For example: whois -v "www.google.com".
+6.	Review the terminal output to extract the domain registry records.
+
