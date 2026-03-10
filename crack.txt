@@ -1,0 +1,28 @@
+Practical Implementation: Cain and Abel
+Task A: Windows Account Dictionary Attack (NTLM)
+The objective is to extract local user password hashes from the Windows Security Account Manager (SAM) database and crack them using a predefined list of common passwords (a wordlist).
+Step 1: Hash Extraction
+1.	Open Cain and Abel (Run as Administrator).
+2.	Navigate to the Cracker tab at the top.
+3.	On the left pane, click on LM & NTLM Hashes.
+4.	Click the blue "+" (Add to list) icon on the top toolbar.
+5.	Select Import Hashes from local system and click Next. Cain will dump the user accounts and their corresponding LM/NTLM hashes into the main window.
+Step 2: Executing the Dictionary Attack
+1.	Right-click on the user account you wish to crack.
+2.	Select Dictionary Attack -> NTLM Hashes.
+3.	In the new dialog box, click on the Add to list button and select your wordlist file (e.g., rockyou.txt or a smaller custom dictionary provided in your lab).
+4.	Click Start. The tool will begin hashing every word in the dictionary and comparing it against the target NTLM hash. Once a match is found, the plaintext password will appear in the "Password" column.
+
+Task B: Wireless Network Password Decoding (WPA-PSK)
+Cain and Abel cannot capture WPA handshakes natively as well as modern Linux suites (like Aircrack-ng), but it can perform offline dictionary attacks against captured handshake files (.cap or .pcap).
+Step 1: Loading the Capture File
+1.	Navigate to the Cracker tab.
+2.	On the left pane, scroll down and select 802.11 Captures.
+3.	Click the "+" (Add to list) icon.
+4.	Browse to and load the .cap file containing the 4-way handshake (this file is usually provided by the examiner or captured prior using an adapter in monitor mode).
+Step 2: Decoding via Dictionary Attack
+1.	The loaded file will display the wireless network's SSID and the captured handshake.
+2.	Right-click the target network and select Dictionary Attack -> WPA-PSK Hashes.
+3.	Add your wordlist just as you did in Task A.
+4.	Click Start. Cain will compute the Pairwise Master Key (PMK) for each word in the list using the SSID as the salt, attempting to decode the handshake.
+
