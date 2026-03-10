@@ -1,10 +1,30 @@
+ACK -sA (TCP ACK scan)
+It never determines open (or even open | filtered) ports. It is used to map out firewall rulesets, determining
+whether they are stateful or not and which ports are filtered
+sudo nmap -sA -T4 scanme.nmap.org
+
+SYN (stealth) Scan (-sS)
+SYN scan is the default and most popular scan option for good reason. It can be performed quickly,
+scanning thousands of ports per second on a fast network not hampered by intrusive firewalls. 
+sudo nmap -sS -T4 -F scanme.nmap.org
 sudo nmap -sS -T4 scanme.nmap.org
 
+FIN Scan (-sF)
+Sets just the TCP FIN bit.
+nmap -sF -T4 scanme.nmap.org
+
+NULL Scan (-sN) : Does not set any bits (TCP flag header is 0) 
+nmap -sN -p 22 scanme.nmap.org
+
+XMAZ Scan (-sX):
+Sets the FIN, PSH, and URG flags, lighting the packet up like a Christmas tree. 
+nmap -sX -T4 scanme.nmap.org
+sudo nmap -sX -T4 -p 22,80,443,113 -v scanme.nmap.org
+
+Port Scan
 nmap -p22,113,139 scanme.nmap.org
 
-sudo nmap -sS -T4 scanme.nmap.org
 
-sudo nmap -sX -T4 -p 22,80,443,113 -v scanme.nmap.org
 
 Practical Implementation: Nmap Port Scanning
 
