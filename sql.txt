@@ -1,0 +1,41 @@
+Step 1: Open XAMPP and start Apache and MySQL and Go to web browser and enter site
+http://localhost/phpmyadmin/
+Step 2: Create database with name DVWA.
+Step 3: Go to site localhost:8080/setup.php after login and click on setup/reset database.
+Step 4: Click on SQL injection option in left. Write “1’ or ‘=” in text box and click submit.
+Step 5: Write “1” in text box and click on submit.
+Step 6: write “1=1” in text box and click on submit.
+Step 7: Write”1*”vin text box and click on submit
+
+
+Step 1: Environment Setup and Discovery
+
+Access your local vulnerable web application (e.g., the DVWA "SQL Injection" module or a lab-provided login page).
+
+To test if the input field is vulnerable, inject a single control character: ' (a single quote).
+
+Click Submit. If the application returns a raw database error (e.g., Syntax error in SQL statement), it confirms that your input is interacting directly with the database interpreter. The vulnerability exists.
+
+Step 2: Executing Authentication Bypass
+
+Navigate to the vulnerable login portal.
+
+In the "Username" field, inject the classic Boolean payload: admin' OR '1'='1' -- 
+
+Leave the "Password" field blank or type any random characters.
+
+Click Login.
+
+The Result: The application grants you access to the administrator dashboard without requiring the actual password.
+
+Step 3: Data Extraction (UNION-Based SQLi)
+If the practical requires you to dump the database:
+
+Find a vulnerable search or ID field.
+
+Determine the number of columns being queried using ORDER BY: 1' ORDER BY 3 --  (increment the number until it errors out).
+
+Inject a UNION statement to append your own query to the original one:
+1' UNION SELECT user, password FROM users -- 
+
+The Result: The web page will display the usernames and passwords from the database directly on your screen.
