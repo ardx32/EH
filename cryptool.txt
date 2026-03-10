@@ -1,0 +1,18 @@
+Method A: Symmetric Encryption (e.g., Caesar Cipher or DES) Symmetric encryption uses the same key for both the encryption and decryption processes.
+1.	Initialize: Open the CrypTool application.
+2.	Create Plaintext: Go to File > New. Type a sample message (e.g., "Confidential System Data") into the blank document.
+3.	Select Algorithm: Navigate to the top menu and select Encrypt/Decrypt > Symmetric (classic) > Caesar (for a basic example) OR Symmetric (modern) > DES (for an advanced example).
+4.	Encrypt: * A dialog box will appear asking for a key.
+o	If using Caesar, enter a numerical shift value (e.g., 3).
+o	If using DES, enter a hexadecimal key (e.g., 01 23 45 67 89 AB CD EF).
+o	Click Encrypt. A new window will appear displaying the scrambled ciphertext.
+5.	Decrypt: * Keep the ciphertext window active.
+o	Go back to Encrypt/Decrypt and select the exact same algorithm you used.
+o	When prompted, enter the exact same key you used for encryption.
+o	Click Decrypt to restore your original plaintext.
+
+Method B: Asymmetric Encryption (e.g., RSA) Asymmetric encryption uses a mathematically linked pair of keys: a Public Key for encryption and a Private Key for decryption.
+1.	Generate Keys: Go to Digital Signatures/PKI > PKI > Generate/Import Keys. Generate an RSA key pair and provide a PIN to secure your Private Key.
+2.	Create Plaintext: Go to File > New and type your message.
+3.	Encrypt: Navigate to Encrypt/Decrypt > Asymmetric > RSA Encryption. Select the recipient's Public Key from the certificate list and encrypt the document.
+4.	Decrypt: With the ciphertext window active, go to Encrypt/Decrypt > Asymmetric > RSA Decryption. Select your Private Key, enter the PIN you created in Step 1, and decrypt the text.
