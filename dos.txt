@@ -1,0 +1,57 @@
+Practical Implementation: DoS using Nemesy
+The objective is to utilize Nemesy—a Windows-based packet generation tool—to flood a target system with User Datagram Protocol (UDP) packets, intentionally exhausting its network bandwidth and processing capabilities.
+
+Step 1: Environment Setup and Baseline Observation
+
+Ensure your attacker machine and target machine (e.g., a Windows or Linux VM) are isolated on a local Host-Only or NAT virtual network. Executing this against external, unauthorized servers is a severe legal violation.
+
+On the target machine, open Task Manager (Windows) or htop (Linux) to monitor baseline CPU and memory usage.
+
+On the target machine, start a continuous ping loop to its gateway or another local machine (ping -t 192.168.1.1) to monitor baseline network latency.
+
+Step 2: Configuring the Nemesy Payload
+
+Launch the Nemesy executable (Run as Administrator).
+
+Configure the attack parameters in the graphical interface:
+
+Target IP: Enter the IP address of your target VM.
+
+Target Port: Enter a specific port (like 80 for HTTP or 53 for DNS) or leave it as 0 to flood all ports randomly.
+
+Packets: Set this to 0 (which instructs Nemesy to send an infinite, continuous stream).
+
+Size: Enter the payload size in bytes (e.g., 1024 or 4096). Larger packets consume more bandwidth, while smaller packets force the target's CPU to work harder processing the headers.
+
+Delay: Set the delay to 0 milliseconds for maximum throughput.
+
+Step 3: Execution and Impact Analysis
+
+Click the Start or Send button in Nemesy.
+
+Switch your focus to the target machine's monitoring tools to observe the impact on availability and performance:
+
+CPU Spikes: You will observe a massive spike in CPU usage. The operating system's kernel is spending all its interrupt cycles trying to process the incoming garbage packets.
+
+Network Latency: Look at the continuous ping loop you started in Step 1. The response times will skyrocket (e.g., from 1ms to 3000ms), or the pings will start dropping entirely (Request timed out).
+
+
+  
+UDP Flooding with hping3
+hping3 is a command-line oriented TCP/IP packet assembler and analyzer. It grants you granular control over the packet headers, making it an excellent tool for first-principles network testing.
+
+Step 1: The Execution Command
+Open your Kali Linux terminal and execute the following command against your isolated target VM:
+
+Bash
+sudo hping3 --udp --flood --rand-source -p 80 [Target_IP]
+Step 2: Analytical Breakdown of the Parameters
+
+--udp: Instructs the tool to use the connectionless User Datagram Protocol, mimicking the exact behavior of Nemesy.
+
+--flood: Pushes packets out as fast as possible without waiting for any replies from the target. This is the parameter that triggers the resource exhaustion.
+
+--rand-source: Spoofs the source IP address for every single packet. This masks your Kali machine's IP and prevents the target's firewall from mitigating the attack by simply blocking a single offending IP address.
+
+-p 80: Directs the flood at a specific port (in this case, HTTP).
+Application Unresponsiveness: Try to open a web page or a file on the target. The GUI will likely freeze or become severely sluggish because system resources are entirely consumed by the network stack.
