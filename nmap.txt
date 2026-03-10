@@ -1,0 +1,55 @@
+sudo nmap -sS -T4 scanme.nmap.org
+
+nmap -p22,113,139 scanme.nmap.org
+
+sudo nmap -sS -T4 scanme.nmap.org
+
+sudo nmap -sX -T4 -p 22,80,443,113 -v scanme.nmap.org
+
+Practical Implementation: Nmap Port Scanning
+
+The objective is to utilize Nmap (Network Mapper) to probe a target IP address or domain to discover open ports, identify running services, and fingerprint the host operating system.
+Step 1: Environment Preparation Open your terminal (Kali Linux/Ubuntu) or Command Prompt (if using Nmap for Windows). Ensure you have authorized permission to scan the target, or use the globally permitted test server: scanme.nmap.org.
+Step 2: Executing Scan Profiles Execute the following commands sequentially to observe different levels of active footprinting.
+•	1. The Basic Ping Scan (Host Discovery):
+
+o	nmap -sn 192.168.1.0/24
+
+o	Purpose: Determines which hosts are active on the local subnet without scanning any ports.
+•	2. The Standard TCP Connect Scan:
+
+o	nmap -sT scanme.nmap.org
+
+o	Purpose: Establishes a full connection to determine if ports are open. Reliable, but highly noisy and easily logged by firewalls.
+•	3. The Stealth SYN Scan (Root/Admin privileges required):
+
+o	sudo nmap -sS scanme.nmap.org
+
+o	Purpose: The default and most popular scan. It sends incomplete connections to bypass basic logging mechanisms.
+•	4. Service and Version Detection:
+
+o	nmap -sV -p 22,80,443 scanme.nmap.org
+
+o	Purpose: Interrogates open ports (like SSH on 22 or HTTP on 80) to grab the service banner and determine the exact software version running (e.g., Apache 2.4.41).
+•	5. Aggressive OS Fingerprinting:
+
+o	sudo nmap -O scanme.nmap.org
+
+o	Purpose: Analyzes the subtle behavioral differences in how the target responds to malformed packets to guess its Operating System (e.g., Windows Server 2019 vs. Linux Kernel 5.4).
+Step 3: Output Analysis Review the terminal output. Nmap categorizes ports into specific states:
+•	Open: An application is actively accepting TCP connections or UDP datagrams on this port.
+•	Closed: The port is accessible (it receives Nmap probe packets), but no application is listening on it.
+•	Filtered: Nmap cannot determine whether the port is open because packet filtering (a firewall) prevents probes from reaching the port.
+________________________________________
+II. Analytical Breakdown: The Mechanics of a Stealth Scan
+To master active footprinting, you must understand the exact packet-level exchanges occurring at the Transport Layer (Layer 4).
+The Standard TCP Handshake (How nmap -sT works):
+1.	Attacker: Sends a SYN (Synchronize) packet to the target port.
+2.	Target: If open, replies with SYN-ACK (Synchronize-Acknowledge).
+3.	Attacker: Replies with ACK (Acknowledge). The connection is established. The target's application now logs this connection.
+The Stealth SYN Scan (How nmap -sS works): Nmap engineers the -sS flag to manipulate this state machine and avoid application-level logging.
+1.	Attacker: Sends a SYN packet.
+2.	Target: If open, replies with SYN-ACK.
+3.	Attacker: Instead of completing the handshake, the attacker immediately sends an RST (Reset) packet.
+4.	Result: The connection is violently torn down before it is fully established. Because the connection was never completed, standard application logs (like an Apache access log) will not record the interaction, yet the attacker successfully confirmed the port is open.
+
