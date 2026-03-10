@@ -1,0 +1,24 @@
+Practical Implementation: ARP Poisoning on Windows
+
+The objective is to position your Windows machine logically between a target victim (e.g., another PC on the same Wi-Fi) and the network gateway (the router), allowing you to intercept and redirect their traffic.
+
+Step 1: Network Discovery (Mapping the Subnet)
+1.	Open Cain and Abel and ensure the Sniffer is activated (the network card icon on the top toolbar).
+2.	Navigate to the Sniffer tab and click on the Hosts sub-tab at the bottom.
+3.	Click the "+" (Add to list) icon. Select "MAC Scanner" and scan your subnet (e.g., 192.168.1.1 to 192.168.1.254).
+4.	The tool will populate a list of all active IP addresses and their corresponding MAC (hardware) addresses on your local network.
+
+Step 2: Configuring the Poisoning Matrix
+1.	Switch to the APR (ARP Poison Routing) sub-tab at the bottom of the screen.
+2.	Click anywhere in the top, empty pane, then click the "+" (Add to list) icon.
+3.	A routing matrix will appear with two columns.
+o	Left Column: Select the IP address of your Gateway (Router).
+o	Right Column: Select the IP address of your Target Victim.
+4.	Click OK. This configures Cain to tell the router that your machine is the victim, and to tell the victim that your machine is the router.
+
+Step 3: Execution and Interception
+1.	Click the Start/Stop ARP icon (the yellow/black radioactive symbol on the top toolbar).
+2.	Result: Your Windows system is now broadcasting forged ARP replies. Traffic from the victim is now flowing through your machine before reaching the internet.
+3.	You can analyze intercepted passwords or VoIP traffic in the Passwords or VoIP tabs at the bottom.
+
+try: testphp.vulnweb.com/login.php 
